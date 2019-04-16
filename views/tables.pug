@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  h1= title
+
+  // http://markade.il.ly/docs/pug.html
+  // https://github.com/wankdanker/node-tableify
+  p aaa
+
+  include html/debug.html
+
+  div.row
+
+      div(class='column column-75')
+        table.table
+          tbody
+            each row in jsonTable
+              if (row.TABLE_TYPE=="BASE TABLE")
+                tr
+                  td
+                    a(class="btn table_process tablename_"+row.TABLE_NAME data-tablename=""+row.TABLE_NAME href="/table/" + row.TABLE_NAME) #{row.TABLE_NAME}
+                  td= row.TABLE_NAME
+                  td= row.TABLE_ROWS
+                  td= row.DATA_LENGTH
+                  td= row.UPDATE_TIME
+            else
+              tr
+                td "No tables"
+
+      div(class='column column-50')
+        ul
+          each val in newstuff
+            //= val
+            //console.log(val)
+            li= val.username
+
+
+  div.row
+    div(class='col-md-12')
+      div#table_list_info
+      div#table_list_result
+
+  include html/modal_row.html

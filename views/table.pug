@@ -1,0 +1,19 @@
+extends layout
+
+block content
+
+  //include menu.html
+
+  h1= title
+  p Table #{title}
+
+
+  div
+    table.table
+    tbody
+      each row in tableRes
+        tr
+
+          each r in row
+            td aaa
+            td #{r}
