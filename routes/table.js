@@ -9,6 +9,8 @@ let table = require('../controllers/table');
 
 router.get('/', table.index);
 
-router.get('/:tablename', table.list);
+//router.get('/:tablename', table.list);
+
+router.get('/querytable', table.querytable);
 
 module.exports = router;

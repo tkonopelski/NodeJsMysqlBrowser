@@ -1,5 +1,10 @@
-extends layout
+extends layout_dashboard
 
 block content
-  h1= title
-  p Welcome to #{title}
+
+  include html/tabs.html
+
+  div#table_list_info
+  div#nmbGetTablesList
+
+  include html/modal_row.html

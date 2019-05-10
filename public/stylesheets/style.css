@@ -18,3 +18,38 @@ a {
   max-width: 200px;
 
 }
+
+.swichTabTableInfo {
+  font-size: 1.1em;
+  background: #e9ecef;
+  color: #666;
+  padding: 2px 6px;
+  padding-left: 10px;
+  margin-bottom: 5px;
+  margin-top: 3px;
+
+}
+
+.tableColorNumeric {
+  color: #005d2b;
+}
+
+#criteriaColumnOperators{
+  display: none;
+}
+
+.queryTableSortUpDown {
+  cursor: pointer;
+}
+
+.queryTableSortUpDown:hover {
+  color: #00d1b2;
+}
+
+.queryTableSortUpDownActive {
+  color: #9f191f;
+}
+
+tr.queryTableTrName {
+  background: #00ff96;
+}

@@ -1,0 +1,131 @@
+<style>
+
+    .nav-tabs > li {
+        position:relative;
+    }
+    .nav-tabs > li > a {
+        display:inline-block;
+    }
+    .nav-tabs > li > span {
+        display:none;
+        cursor:pointer;
+        position:absolute;
+        right: 6px;
+        top: 8px;
+        color: red;
+    }
+    .nav-tabs > li:hover > span {
+        display: inline-block;
+    }
+
+</style>
+
+
+<ul class="nav nav-tabs" role="tablist" id="nmbTabsUl">
+    <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home
+            <span> x </span>
+        </a>
+    </li>
+
+
+    <li><a href="#" class="add-contact nav-link">+ Add </a></li>
+
+</ul>
+
+
+
+<div class="d-none" id="nmbTabMainParams">
+
+
+    <div class="mainTab">
+
+        <div class="swichTab" >
+
+            <div class="swichTabTableInfo" data-tablename="" data-sorting="" data-sorting-column="" >
+
+            </div>
+
+
+
+
+
+
+        </div>
+
+        <form class="formTabForm">
+        <div class="formTab" >
+
+        </div>
+        </form>
+
+        <div class="navigationTab d-none float-right">
+
+            <button class="btn btn-danger btn-sm mainTabFormShow">Filter</button>
+
+            Limit:
+            <input type="number" id="" class="navigationTabLimit" value="10" style="width: 60px;" >
+
+            <button class="navigationTabReload btn btn-primary btn-sm ">Reload</button>
+        </div>
+
+        <div class="paginatorTab">
+            <ul class="pagination-sm"></ul>
+        </div>
+
+
+
+        <div class="tabulatorTab"></div>
+
+    </div>
+
+</div>
+
+
+
+<div class="tab-content" id="nmbTabContent">
+
+    <div class="tab-pane fade1 show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+    </div>
+
+    <div class="tab-pane " id="profile" role="tabpanel" aria-labelledby="profile-tab">3333</div>
+
+</div>
+
+
+
+<div id="criteriaColumnOperators">
+
+    <select name="criteria" class="form-control form-control-sm">
+        <option value="=">=</option>
+        <option value=">">&gt;</option>
+        <option value=">=">&gt;=</option>
+        <option value="<">&lt;</option>
+        <option value="<=">&lt;=</option>
+        <option value="!=">!=</option>
+        <option value="LIKE">LIKE</option>
+        <option value="LIKE %...%">LIKE %...%</option>
+        <option value="NOT LIKE">NOT LIKE</option>
+        <option value="IN (...)">IN (...)</option>
+        <option value="NOT IN (...)">NOT IN (...)</option>
+        <option value="BETWEEN">BETWEEN</option>
+        <option value="NOT BETWEEN">NOT BETWEEN</option>
+        <option value="IS NULL">IS NULL</option>
+        <option value="IS NOT NULL">IS NOT NULL</option>
+    </select>
+
+
+</div>
+
+<script>
+    let nodeMySqlBrowser;
+    jQuery(document).ready(function () {
+
+        nmbTabsActions();
+
+        nodeMySqlBrowser = new NodeMySqlBrowser();
+    });
+
+
+</script>
