@@ -12,10 +12,11 @@ var tableRouter = require('./routes/table');
 
 var app = express();
 
-// mustache
+// mustache OFF
 //app.engine('mustache', mustache);
 //app.set('view engine', 'mustache');
 //app.set('views', __dirname + '/views');
+
 
 // pug
 app.set('views', path.join(__dirname, 'views'));
@@ -34,7 +35,7 @@ app.use('/users', usersRouter);
 app.use('/show', showRouter);
 app.use('/table', tableRouter);
 
-console.log('404444444');
+console.log('APP...');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -48,7 +49,7 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
 
-  //console.log(err);
+  console.log(err);
 
   // render the error page
   res.status(err.status || 500);

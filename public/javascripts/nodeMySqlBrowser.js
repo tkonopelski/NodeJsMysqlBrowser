@@ -11,31 +11,32 @@ function NodeMySqlBrowser() {
 
     console.log('NodeMySqlBrowser');
 
-    this.type = "macintosh";
-    this.version = "1.1";
+    this.version = "1.2";
     this.isDebug = true;
-
     this.divTabHw = false;
-    //this.elementTabsul
+
 
     this.getInfo = function () {
         console.log('getInfo');
-        return this.version + '  0.1b';
+        return 'V:' + this.version + ' D:' + Number(this.isDebug);
     };
 
     this.init = function () {
-        console.log('INIT');
 
+        console.log('INIT 2');
+
+        this.loadDatabases();
+        this.tabsActions();
 
         // Reload
         $(this.getActiveTab() + ' .navigationTab .navigationTabReload').click(function(event) {
             event.preventDefault();
-            //event.stopPropagation();
-            //$("#box").show();
 
             console.log('navigationTabReload');
             //console.log(this);
             //console.log($(this));
+
+          
 
             initParams = {};
             initParams.tablename = $(nodeMySqlBrowser.getActiveTab() + ' .swichTab .swichTabTableInfo').data('tablename');
@@ -44,7 +45,7 @@ function NodeMySqlBrowser() {
 
 
 
-        // Show search forms
+        // Show/Hide search forms
         $(this.getActiveTab() + ' .mainTabFormShow').click(function(event) {
             event.preventDefault();
             let path = nodeMySqlBrowser.getActiveTab() + ' form.formTabForm .formColumns';
@@ -55,15 +56,24 @@ function NodeMySqlBrowser() {
     };
 
 
-
+    /**
+     * Return html table from json data
+     *
+     * @param jsonSourceData
+     * @returns {string|*|jQuery}
+     */
     this.getTableFromJson = function (jsonSourceData) {
+
+        console.log(jsonSourceData);
+
+        if (!jsonSourceData || jsonSourceData.length == 0) {
+            console.log('getTableFromJson  NO DATA');
+            return  '';
+        }
 
         initParams = arguments[1] || {};
 
-        console.log('TTT initParams', initParams);
-
         let contentLimit = 50;
-
         let tbl = document.createElement('table');
         tbl.setAttribute('class', 'table thead-dark table-striped table-bordered table-hover table-sm queryTable');
 
@@ -75,9 +85,8 @@ function NodeMySqlBrowser() {
 
 
         if (tableHeaderKeys.length == 0) {
-            return '';
+            console.log('getTableFromJson  NO DATA 2');
         }
-
 
         let sorting = '';
         let sortingColumn = '';
@@ -86,7 +95,6 @@ function NodeMySqlBrowser() {
             sorting = initParams.sorting;
             sortingColumn = initParams.sortingColumn;
         }
-
 
         for (let kc = 0; kc < tableHeaderKeys.length; kc++)
         {
@@ -119,12 +127,12 @@ function NodeMySqlBrowser() {
 
                 let val = jsonSourceData[jr][tableHeaderKeyArray[ki]];
                 if (val && val.length > contentLimit) {
-                    tableDataRow.append('<td>'+val.substring(0, contentLimit) + '...');
+                    tableDataRow.append('<td>'+ this.escapeHtml(val.substring(0, contentLimit) + '...') );
                 } else {
                     if ($.isNumeric(val)) {
                         tableDataRow.append('<td class="tableColorNumeric">'+val);
                     } else {
-                        tableDataRow.append('<td>'+val);
+                        tableDataRow.append('<td>'+ this.escapeHtml(val) + '</td>');
                     }
                 }
             }
@@ -137,6 +145,12 @@ function NodeMySqlBrowser() {
 
     };
 
+
+    /**
+     * Get Active Tab
+     *
+     * @returns {*|jQuery|boolean}
+     */
     this.getActiveTab = function () {
         let active = jQuery('#nmbTabsUl li a.active');
         if (active && active.length > 0) {
@@ -146,29 +160,50 @@ function NodeMySqlBrowser() {
         return false;
     };
 
-    // Get table
+
+    /**
+     * Escape 
+     * 
+     * @todo: move to server side
+     */
+    this.escapeHtml = function (text) {
+
+        if (typeof text === 'string' || text instanceof String) {        
+
+            let map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        } else {
+            return '';
+        }
+    };
+
+
+    /**
+     * Get table
+     *
+     * @param params
+     */
     this.getQueryTable = function (params) {
 
         //console.log('%c THIS.getQueryTable: ' + params.tablename, 'background: #222; color: #bada55', params);
 
         let divId = '#nmbGetTablesList';
-        //divId = nmbTabsGetActiveDiv();
         divId = this.getActiveTab();
-
-
         let divActiveid = divId;
         divId = divId + ' .tabulatorTab';
 
-        //console.log(params);
         let initParams = {}
 
         if (params.tablename && params.tablename.length>1) {
-
             initParams.tablename = params.tablename;
         } else {
-
             initParams.tablename = $(this.getActiveTab() + ' .swichTab .swichTabTableInfo').data('tablename');
-
         }
 
         if (params.limit && params.limit.length > 0) {
@@ -188,17 +223,10 @@ function NodeMySqlBrowser() {
             initParams.sortingColumn = params.sortingColumn;
         }
 
-        //navigationTabLimit
         if (jQuery(divActiveid + ' .navigationTabLimit').val() > 0) {
-
-            //console.log('FFF LIM', jQuery(divActiveid + ' .navigationTabLimit').val());
             initParams.limit = jQuery(divActiveid + ' .navigationTabLimit').val();
-
         }
 
-        //let  serialForm = jQuery(divActiveid+ ' form.formTabForm').serializeArray();
-        //console.log( serialForm );
-        //initParams.filterCols = serialForm;
 
         if (params.filterCols) {
             initParams.filterCols = params.filterCols;
@@ -208,19 +236,11 @@ function NodeMySqlBrowser() {
         }
 
         console.log('%c' + params.tablename, 'background: #222; color: #bada55', params, initParams);
-        //console.log(initParams);
-
-        //let limitPage = (params.limitpage) ? params.limitpage : 1;
 
         initParams.limitpage = (params.limitpage && params.limitpage > 0) ? params.limitpage : 1;
 
-        //$('#nmbTabContent '+divActiveid + ' .paginatorTab ul').empty();
-
         jQuery(divId).text('Loading...');
 
-        //let url = 'gettables';
-        //let url = '/table/' + params.tablename + '?' + Object.entries(initParams).map(e => e.join('=')).join('&');
-        //let url = '/table/' + params.tablename;
         let url = '/table/querytable';
 
         $.ajax({
@@ -244,33 +264,26 @@ function NodeMySqlBrowser() {
                     index++;
                 });
 
-
-
                 jQuery(divActiveid + ' .navigationTabLimit').val(initParams.limit);
                 jQuery(divActiveid + ' .swichTab .swichTabTableInfo').html(initParams.tablename);
-
-                //jQuery(divActiveid + ' .swichTab .swichTabTableInfo').data('tablename', initParams.tablename);
-                //jQuery(divActiveid + ' .swichTab .swichTabTableInfo').data('sortingColumn', initParams.sortingColumn);
-                //jQuery(divActiveid + ' .swichTab .swichTabTableInfo').data('sorting', initParams.sorting);
 
                 jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-sorting', initParams.sorting);
                 jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-tablename', initParams.tablename);
                 jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-sorting', initParams.sorting);
                 jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-sorting-column', initParams.sortingColumn);
 
-                //console.log(divActiveid + ' .swichTab .swichTabTableInfo');
-                //console.log(initParams.sorting);
-                //console.log(initParams);
-
                 jQuery(divActiveid + ' .navigationTab').removeClass('d-none');
 
+
+                /**
+                 * Twbs Pagination
+                 *
+                 */
                 if ( data.count/initParams.limit >= 1) {
 
                     $('#nmbTabContent '+divActiveid + ' .paginatorTab ul').twbsPagination('destroy');
-
                     let twbsPage = 2;
 
-                    // Pagination
                     $('#nmbTabContent '+divActiveid + ' .paginatorTab ul').twbsPagination({
                         totalPages: data.count/initParams.limit+1,
                         //visiblePages: initParams.limit,
@@ -279,8 +292,8 @@ function NodeMySqlBrowser() {
                         startPage: initParams.limitpage,
                         //itemOnPage: 8, // TODO
                         onPageClick: function (event, page) {
-                            event.preventDefault();
 
+                            event.preventDefault();
                             let params = {};
                             params.tablename = tName;
                             //params.limit = 10;
@@ -290,7 +303,7 @@ function NodeMySqlBrowser() {
                             params.sorting = jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-sorting');
                             params.sortingColumn = jQuery(divActiveid + ' .swichTab .swichTabTableInfo').attr('data-sorting-column');
 
-                            nodeMySqlBrowser.getQueryTable(params);
+                            nodeMySqlBrowser.getQueryTable(params); // GO!
 
                         }
                     });
@@ -320,11 +333,6 @@ function NodeMySqlBrowser() {
                     initParams.sortingColumn = $(this).data('sorting-column');
                     nodeMySqlBrowser.getQueryTable(initParams);
 
-                    // not here
-                    //$(divActiveid + ' .queryTableSortUpDown').removeClass('queryTableSortUpDownActive');
-                    //$(this).addClass('queryTableSortUpDownActive');
-
-
                 });
 
             },
@@ -333,44 +341,20 @@ function NodeMySqlBrowser() {
                 console.log("ERROR: ajax error response type "+type);
             }
         });
-
-
-
-
-        /*
-        params = {};
-        params.tablename='userinput';
-        nodeMySqlBrowser.getTable(params);
-
-
-        */
-
-
-
-
-
     }; // getQueryTable
 
 
     this.getQueryTableFilter = function (cols, data) {
 
         let formHtml = '';
-
         formHtml = '';
-
-        //console.log(cols);
 
         let formPrams = {};
         formPrams.fields_column = {};
 
         for (const ckey in cols) {
 
-            //console.log(cols[ckey]);
-            //formPrams.fields_column.push(cols[ckey]);
-            //formPrams.fields_column[ckey]  = cols[ckey];
-
             formPrams.fields_column[ckey]  = { field: cols[ckey].field};
-
         }
         //console.log(formPrams.fields_column);
 
@@ -384,7 +368,7 @@ function NodeMySqlBrowser() {
 
         let serialForm = jQuery(divActiveid+ ' form.formTabForm').serializeArray();
 
-        console.log(serialForm);
+        //console.log(serialForm);
 
         let newData = {};
         for (const ckey in serialForm) {
@@ -404,7 +388,6 @@ function NodeMySqlBrowser() {
 
     this.getFormColumns = function (columns, params) {
 
-        //console.log('filterCols', params.filterCols);
         let criteriaColumnOperators = $('#criteriaColumnOperators').html();
 
         let formHtml = '';
@@ -418,12 +401,10 @@ function NodeMySqlBrowser() {
                     val = params.filterCols[par].value;
                 }
             }
-            //console.log(val);
 
             formHtml += '<div class="col-auto">';
             formHtml += '<label class="" for="inlineFormInput">'+ columns[ckey].field +'</label>';
             formHtml +=  criteriaColumnOperators ;
-            //formHtml += '<input type="text" class="form-control form-control-sm mb-2" name="[columns]['+ckey+']['+columns[ckey].field+']" placeholder="'+columns[ckey].field+'"> '
             formHtml += '<input type="text" class="form-control form-control-sm mb-2" name="'+ columns[ckey].field +'" placeholder="'+columns[ckey].field+'" value="'+val+'"> '
             formHtml += '</div>';
 
@@ -437,15 +418,210 @@ function NodeMySqlBrowser() {
     };
 
 
+    this.loadDatabases = function () {
+
+
+        console.log('load 11111');
+
+        $.ajax({
+            type: 'GET',
+            url: '/databases',
+            success: function(data){
+    
+                console.log(data);
+    
+                let selectHtml = '<select id="navDatatablesSelect" class="form-control">';
+                selectHtml += '<option></option>';
+    
+                for (let element in data) {
+                    selectHtml += '<option>'+ data[element].Database +'</option>';
+                }
+                selectHtml += '</<select>';
+    
+                jQuery('#navDatatablesDiv').html(selectHtml);
+    
+    
+                $('#navDatatablesSelect').on('change', function() {
+                    console.log( this.value );
+    
+                    Cookies.set('nmb_dbname', this.value, { expires: 100 });
+    
+                    let params = {};
+                    params.tablename = this.value;
+                    nodeMySqlBrowser.getTablesList(params);
+                });
+    
+    
+            },
+            error: function(xhr, type, exception) {
+                // if ajax fails display error alert
+                alert("ajax error response type "+type);
+            }
+        });
+    };
+
+
+
+    /**
+     * Old get tables
+     * 
+     */
+    this.getTablesList = function (params) {
+
+        console.log('nmbGetTablesList OOP');
+
+
+        console.log('%c nmbGetTablesList! ', 'background: #222; color: #cccccc');
+        //let initParams = {}
+        //initParams.tablename = params.tablename;
+        //initParams.limit = 100;
+        //console.log(initParams);
+
+        $.ajax({
+            type: 'GET',
+            url: '/gettables',
+            //data: "q="+myform.serialize(),
+            //data: initParams,
+            success: function(data){
+
+                console.log(data);
+                jQuery('#navTables').html('Loading...');
+
+                let ulHtml = '<ul id="navDatatablesListUl" class="list-group">';
+
+                let count = '';
+                let size = '';
+                let sizeMB, sizeKB = '';
+                let label = '';
+                for (let element in data) {
+                    
+
+                    // round(((data_length + index_length) / 1024 / 1024), 2) `Size in MB` 
+                    size = (data[element].DATA_LENGTH + data[element].INDEX_LENGTH);
+                    sizeMB = (size/1024)/1024;
+                    sizeKB = (size/1024).toFixed(1);
+                    sizeMB = sizeMB.toFixed(1);
+
+                    console.log(sizeMB);
+                    
+                    count = '<span class="badge badge-primary badge-pill">'+ data[element].TABLE_ROWS + '/' + sizeMB  + 'MB</span>';
+
+
+                    label = '<div class="navDatatablesListLabel">'+ data[element].TABLE_ROWS + '/' + sizeKB  + 'KB</div>';
+                    count = label;
+
+//                    ulHtml += '<li class="list-group-item d-flex justify-content-between align-items-center" ' +
+  //                      'data-tablename="'+ data[element].TABLE_NAME +'">'+ data[element].TABLE_NAME +' '+ count + '</li>';
+
+
+
+                    ulHtml += '<li class="list-group-item d-flex11 justify-content-between11 align-items-center11" ' +
+                        'data-tablename="'+ data[element].TABLE_NAME +'">'+ data[element].TABLE_NAME +' '+ count + '</li>';
+
+
+
+
+                }
+                ulHtml += '</<ul>';
+
+                //console.log(ulHtml);
+
+                //jQuery('#navDatatablesDiv').html(ulHtml);
+                //jQuery('#nmbGetTablesList').html(ulHtml);
+                jQuery('#navTables').html(ulHtml);
+
+
+                $('#navDatatablesListUl li').on('click', function() {
+
+                    console.log('navDatatablesListUl CLICK' + jQuery(this).data('tablename') );
+
+                    let params = {};
+                    //params.tablename = 'userinput';
+                    params.tablename = jQuery(this).data('tablename');
+                    params.limit = 10;
+                    params.filterCols = {};
+
+                    console.log(params);
+                    //nmbGetTable(params);
+
+                    //nodeMySqlBrowser.getTable(params);
+                    nodeMySqlBrowser.getQueryTable(params);
+
+                });
+
+
+            },
+            error: function(xhr, type, exception) {
+                // if ajax fails display error alert
+                alert("ajax error response type "+type);
+            }
+        });
+
+    };
+
+
+    this.tabsActions = function () {
+
+
+        var tabNav = $('#nmbTabMainParams .mainTab').html();
+        //console.log(tabNav);
+        //tabNav = $(tabNav).clone();
+        //console.log(tabNav);
+
+        //jQuery('#nmbTabContent #home').append(tabNav);
+        jQuery(tabNav).appendTo('#nmbTabContent #home');
+        jQuery(tabNav).appendTo('#nmbTabContent #contact');
+
+        $(".nav-tabs").on("click", "a", function (e) {
+            e.preventDefault();
+            if (!$(this).hasClass('add-contact')) {
+                $(this).tab('show');
+            }
+        })
+            .on("click", "span", function () {
+
+                if (!confirm('Delete')) {
+                    return false;
+                }
+
+                var anchor = $(this).siblings('a');
+                $(anchor.attr('href')).remove();
+                $(this).parent().remove();
+                $(".nav-tabs li").children('a').first().click();
+            });
+
+        $('.add-contact').click(function (e) {
+            e.preventDefault();
+            var id = $(".nav-tabs").children().length;
+            var tabId = 'querytab_' + id;
+
+
+            console.log(tabId);
+
+            $(this).closest('li').before('<li><a class="nav-link" data-toggle="tab" role="tab" href="#' + tabId + '">Tab #'+ id +'</a> <span> x </span></li>');
+            //$('.tab-content').append('<div class="tab-pane" id="' + tabId + '"><div class="tabulatorTab">Empty' + id + '</div></div>');
+            //$('.tab-content').append('<div class="tab-pane" id="' + tabId + '">..............</div>');
+
+            //$( '<div class="tab-pane" id="' + tabId + '">..............</div>').insertBefore( ".tab-content" );
+            $('#nmbTabContent').append( '<div class="tab-pane" id="' + tabId + '">..............</div>');
+            //$( '<div class="tab-pane" id="' + tabId + '">..............</div>').insertBefore( "#nmbTabContent" );
+
+        //jQuery('#nmbTabContent #' +tabId).append(tabNav);
+        jQuery('#nmbTabContent #' +tabId).html(tabNav);
+
+
+            $('.nav-tabs li:nth-child(' + id + ') a').click();
+        });
+
+
+    };
 
 
     // private constructor
     let __construct = function(that) {
         that.init();
-        that.version = '2.2';
-        console.log("Object Created.", that);
 
-        //that.divTabHw = $(that.getActiveTab());
+        console.log("Object Created.", that);
 
     }(this)
 

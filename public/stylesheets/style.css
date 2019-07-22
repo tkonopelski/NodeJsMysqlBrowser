@@ -53,3 +53,8 @@ a {
 tr.queryTableTrName {
   background: #00ff96;
 }
+
+.navDatatablesListLabel {
+  font-size: 0.8em;
+  color: #ccc;
+}
