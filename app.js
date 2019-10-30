@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var mustache = require('mustache-express');
+//var mustache = require('mustache-express');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

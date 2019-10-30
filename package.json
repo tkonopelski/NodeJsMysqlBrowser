@@ -14,13 +14,13 @@
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
-    "mustache": "^3.0.1",
-    "mustache-express": "^1.2.8",
-    "mysql": "^2.16.0",
-    "pug": "2.0.0-beta11",
-    "tabulator-tables": "^4.2.5"
+    "mustache": "^3.1.0",
+    "mustache-express": "^1.3.0",
+    "mysql": "^2.17.1",
+    "pug": "^2.0.4",
+    "tabulator-tables": "^4.4.3"
   },
   "devDependencies": {
-    "nodemon": "^1.18.11"
+    "nodemon": "^1.19.4"
   }
 }

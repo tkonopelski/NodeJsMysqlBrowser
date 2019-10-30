@@ -8,7 +8,7 @@ var sql = require('../models/db.js');
 
 exports.index = function(req, res, next) {
 
-    res.end('');
+    res.end('noo');
 
 }
 
